@@ -74,26 +74,26 @@ public class MainActivity extends AppCompatActivity{
         setSupportActionBar(toolbar);
 
 
-//        Button matype = this.findViewById(R.id.mapTypeBtn);
-//        matype .setOnClickListener(new View.OnClickListener(){
-//            @Override
-//            public void onClick(View v) {
-//                BaiduMap map= mMapView.getMap();
-//                int type=map.getMapType();
-//                switch(type)
-//                {
-//                    case MAP_TYPE_NORMAL:
-//                        map.setMapType( MAP_TYPE_SATELLITE);//从普通地图切换到卫星地图
-//                        break;
-//                    case MAP_TYPE_SATELLITE:
-//                        map.setMapType(MAP_TYPE_NONE);//从卫星地图切换到空白地图
-//                        break;
-//                    case MAP_TYPE_NONE:
-//                        map.setMapType(MAP_TYPE_NORMAL);//从空白地图切换到普通地图111
-//                        break;
-//                }
-//            }
-//        });
+        ImageButton matype = this.findViewById(R.id.mapTypeBtn);
+        matype.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                BaiduMap map= mMapView.getMap();
+                int type=map.getMapType();
+                switch(type)
+                {
+                    case MAP_TYPE_NORMAL:
+                        map.setMapType( MAP_TYPE_SATELLITE);//从普通地图切换到卫星地图
+                        break;
+                    case MAP_TYPE_SATELLITE:
+                        map.setMapType(MAP_TYPE_NONE);//从卫星地图切换到空白地图
+                        break;
+                    case MAP_TYPE_NONE:
+                        map.setMapType(MAP_TYPE_NORMAL);//从空白地图切换到普通地图111
+                        break;
+                }
+            }
+        });
 //
 //        ImageButton locationBtn=this.findViewById(R.id.locationButton);
 //        locationBtn.setOnClickListener(new View.OnClickListener(){
