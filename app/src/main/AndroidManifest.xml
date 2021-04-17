@@ -29,7 +29,7 @@
             android:process=":remote"/>
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="RQF2IIvWSVbpSq2QG9p48gqDx6kysKza" />
+            android:value="2IT56XoP7GW3G7saSAtcPq6QhQLVNcjr" />
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"

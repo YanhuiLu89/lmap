@@ -11,7 +11,8 @@
         android:id="@+id/bmapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clickable="true"  />
+        android:clickable="true"  >
+    </com.baidu.mapapi.map.MapView>
 
     <ImageButton
         android:id="@+id/mapTypeBtn"
@@ -20,6 +21,13 @@
         android:layout_marginTop="60dp"
         app:layout_anchorGravity="top"
         app:srcCompat="@android:drawable/ic_dialog_map" />
+
+    <ImageButton
+        android:id="@+id/mylocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="630dp"
+        app:srcCompat="@android:drawable/ic_menu_mylocation" />
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_height="wrap_content"

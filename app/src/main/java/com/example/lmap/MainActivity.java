@@ -8,8 +8,11 @@ import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.MapStatus;
+import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationData;
+import com.baidu.mapapi.model.LatLng;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,20 +30,40 @@ import static com.baidu.mapapi.map.BaiduMap.MAP_TYPE_SATELLITE;
 
 public class MainActivity extends AppCompatActivity{
     class MyLocationListener extends BDAbstractLocationListener {
-
-
+        private boolean isFirstLoc=true;
+        private boolean autoLocation=false;
+        public void setAutoLocation(boolean b){
+            autoLocation=b;
+        }
         @Override
         public void onReceiveLocation(BDLocation bdLocation) {
             //mapView 销毁后不在处理新接收的位置
             if (bdLocation == null || mMapView == null){
                 return;
             }
+            int type=bdLocation.getLocType();
             MyLocationData locData = new MyLocationData.Builder()
                     .accuracy(bdLocation.getRadius())
                     // 此处设置开发者获取到的方向信息，顺时针0-360
                     .direction(bdLocation.getDirection()).latitude(bdLocation.getLatitude())
                     .longitude(bdLocation.getLongitude()).build();
-            mMapView.getMap().setMyLocationData(locData);
+            BaiduMap bmap=mMapView.getMap();
+            bmap.setMyLocationData(locData);
+            /**
+             *当首次定位或手动发起定位时，记得要放大地图，便于观察具体的位置
+             * LatLng是缩放的中心点，这里注意一定要和上面设置给地图的经纬度一致；
+             * MapStatus.Builder 地图状态构造器
+             */
+            if (isFirstLoc||autoLocation) {
+                isFirstLoc = false;
+                autoLocation=false;
+                LatLng ll = new LatLng(bdLocation.getLatitude(), bdLocation.getLongitude());
+                MapStatus.Builder builder = new MapStatus.Builder();
+                //设置缩放中心点；缩放比例；
+                builder.target(ll).zoom(18.0f);
+                //给地图设置状态
+                bmap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
+            }
         }
     }
     private MapView mMapView = null;
@@ -94,14 +117,17 @@ public class MainActivity extends AppCompatActivity{
                 }
             }
         });
-//
-//        ImageButton locationBtn=this.findViewById(R.id.locationButton);
-//        locationBtn.setOnClickListener(new View.OnClickListener(){
-//            @Override
-//            public void onClick(View v) {
-//                mLocationClient.start();
-//            }
-//        });
+
+        ImageButton locationBtn=this.findViewById(R.id.mylocation);
+        locationBtn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                //设置手动定位
+                myLocationListener.setAutoLocation(true);
+                //开启地图定位图层
+                mLocationClient.start();
+            }
+        });
     }
 
     @Override
