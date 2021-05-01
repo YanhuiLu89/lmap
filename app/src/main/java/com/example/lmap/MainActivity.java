@@ -1,3 +1,4 @@
+
 package com.example.lmap;
 
 import android.os.Bundle;
@@ -13,22 +14,47 @@ import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.search.core.PoiInfo;
+import com.baidu.mapapi.search.poi.OnGetPoiSearchResultListener;
+import com.baidu.mapapi.search.poi.PoiCitySearchOption;
+import com.baidu.mapapi.search.poi.PoiDetailResult;
+import com.baidu.mapapi.search.poi.PoiDetailSearchResult;
+import com.baidu.mapapi.search.poi.PoiIndoorResult;
+import com.baidu.mapapi.search.poi.PoiResult;
+import com.baidu.mapapi.search.poi.PoiSearch;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
+import android.view.DragEvent;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsListView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import java.util.List;
 
 import static com.baidu.mapapi.map.BaiduMap.MAP_TYPE_NONE;
 import static com.baidu.mapapi.map.BaiduMap.MAP_TYPE_NORMAL;
 import static com.baidu.mapapi.map.BaiduMap.MAP_TYPE_SATELLITE;
 
 public class MainActivity extends AppCompatActivity{
+    private MapView mMapView = null;
+    private  LocationClient  mLocationClient=null;
+    private PoiSearch mPoiSearch=null;
+    private EditText mInputText=null;
+    private BDLocation mCurLocation=null;
     class MyLocationListener extends BDAbstractLocationListener {
         private boolean isFirstLoc=true;
         private boolean autoLocation=false;
@@ -41,6 +67,7 @@ public class MainActivity extends AppCompatActivity{
             if (bdLocation == null || mMapView == null){
                 return;
             }
+            mCurLocation=bdLocation;//保存当前定位，后面检索算路要用
             int type=bdLocation.getLocType();
             MyLocationData locData = new MyLocationData.Builder()
                     .accuracy(bdLocation.getRadius())
@@ -66,23 +93,77 @@ public class MainActivity extends AppCompatActivity{
             }
         }
     }
-    private MapView mMapView = null;
-    private  LocationClient  mLocationClient=null;
+    //创建poi检索监听器
+    OnGetPoiSearchResultListener poiSearchListener = new OnGetPoiSearchResultListener() {
+        @Override
+        public void onGetPoiResult(PoiResult poiResult) {
+            //显示搜索结果
+            List<PoiInfo> poiList=poiResult.getAllPoi();
+            PoiAdapter adapter=new PoiAdapter(MainActivity.this,R.layout.poi_item,poiList);
+            ListView listView=findViewById(R.id.searchResult);
+            listView.setAdapter(adapter);
+            listView.setVisibility(View.VISIBLE);
+
+            //当滑动到底部时加载更多搜索结果
+            listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(AbsListView view, int scrollState) {
+                    if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE) {
+                        // 判断是否滚动到底部
+                        if (view.getLastVisiblePosition() == view.getCount() - 1) {
+                            //加载更多
+                            int curPage=poiResult.getCurrentPageNum();
+                            int totalPage=poiResult.getTotalPageNum();
+                            if(curPage< totalPage)
+                            {
+                                poiResult.setCurrentPageNum(curPage+1);
+                                String city=mCurLocation.getCity();
+                                TextView textV=findViewById(R.id.inputText);
+                                String keyWord=textV.getText().toString();
+                                mPoiSearch.searchInCity(new PoiCitySearchOption()
+                                        .city(city)
+                                        .keyword(keyWord)
+                                        .pageNum(curPage+1));
+                            }
+                        }
+                    }
+                }
+
+                @Override
+                public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
+                }
+            });
+        }
+        @Override
+        public void onGetPoiDetailResult(PoiDetailSearchResult poiDetailSearchResult) {
+
+        }
+        @Override
+        public void onGetPoiIndoorResult(PoiIndoorResult poiIndoorResult) {
+
+        }
+        //废弃
+        @Override
+        public void onGetPoiDetailResult(PoiDetailResult poiDetailResult) {
+
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //获取地图控件引用
         mMapView = (MapView) findViewById(R.id.bmapView);
+
         //开启定位
         mMapView.getMap().setMyLocationEnabled(true);
-
         //定位初始化
         mLocationClient = new LocationClient(this);
-
         //通过LocationClientOption设置LocationClient相关参数
         LocationClientOption option = new LocationClientOption();
         option.setOpenGps(true); // 打开gps
+        option.setIsNeedAddress(true);
         option.setCoorType("bd09ll"); // 设置坐标类型
         option.setScanSpan(1000);
         //设置locationClientOption
@@ -92,6 +173,36 @@ public class MainActivity extends AppCompatActivity{
         mLocationClient.registerLocationListener(myLocationListener);
         //开启地图定位图层
         mLocationClient.start();
+
+        //获得检索输入框控件
+        mInputText=findViewById(R.id.inputText);
+        mInputText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                boolean ret=false;
+                if(actionId== EditorInfo.IME_ACTION_SEARCH)
+                {
+                    String city=mCurLocation.getCity();
+                    String keyWord=v.getText().toString();
+                    ret=mPoiSearch.searchInCity(new PoiCitySearchOption()
+                            .city(city)
+                            .keyword(keyWord)
+                            .pageNum(0));
+                    //搜索后隐藏键盘
+                    InputMethodManager imum=(InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+                    View view=getWindow().peekDecorView();
+                    if(view!=null)
+                    {
+                        imum.hideSoftInputFromWindow(view.getWindowToken(),0);
+                    }
+                }
+                return ret;
+            }
+        });
+        //创建poi检索实例
+        mPoiSearch = PoiSearch.newInstance();
+        //设置监听器
+        mPoiSearch.setOnGetPoiSearchResultListener(poiSearchListener);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -173,4 +284,15 @@ public class MainActivity extends AppCompatActivity{
 
         return super.onOptionsItemSelected(item);
     }
+
+     @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+     if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+         ListView listView = findViewById(R.id.searchResult);
+         int left = listView.getLeft(), top = listView.getTop(), right = left + listView.getWidth(), bottom = top + listView.getHeight();
+         if (ev.getX() < left || ev.getX() > right || ev.getY() < top || ev.getY() > bottom)//点击搜索结果列表之外区域，隐藏搜索结果列表
+             listView.setVisibility(View.GONE);
+     }
+     return super.dispatchTouchEvent(ev);
+ }
 }

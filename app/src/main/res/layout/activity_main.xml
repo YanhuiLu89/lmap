@@ -12,13 +12,28 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clickable="true"  >
+
     </com.baidu.mapapi.map.MapView>
+
+
+    <EditText
+        android:id="@+id/inputText"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="50dp"
+        android:background="@android:drawable/editbox_dropdown_dark_frame"
+        android:ems="10"
+        android:hint="请输入要搜索的内容"
+        android:imeOptions="actionSearch"
+        android:inputType="text"
+        android:textColor="@color/white"
+        app:layout_anchorGravity="top" />
 
     <ImageButton
         android:id="@+id/mapTypeBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="100dp"
         app:layout_anchorGravity="top"
         app:srcCompat="@android:drawable/ic_dialog_map" />
 
@@ -28,6 +43,14 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="630dp"
         app:srcCompat="@android:drawable/ic_menu_mylocation" />
+
+    <ListView
+        android:id="@+id/searchResult"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="120dp"
+        android:background="@color/material_on_background_emphasis_high_type"
+        android:visibility="gone" />
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_height="wrap_content"
