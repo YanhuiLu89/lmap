@@ -14,6 +14,7 @@ import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.overlayutil.DrivingRouteOverlay;
 import com.baidu.mapapi.search.core.PoiInfo;
 import com.baidu.mapapi.search.poi.OnGetPoiSearchResultListener;
 import com.baidu.mapapi.search.poi.PoiCitySearchOption;
@@ -22,6 +23,15 @@ import com.baidu.mapapi.search.poi.PoiDetailSearchResult;
 import com.baidu.mapapi.search.poi.PoiIndoorResult;
 import com.baidu.mapapi.search.poi.PoiResult;
 import com.baidu.mapapi.search.poi.PoiSearch;
+import com.baidu.mapapi.search.route.BikingRouteResult;
+import com.baidu.mapapi.search.route.DrivingRouteLine;
+import com.baidu.mapapi.search.route.DrivingRouteResult;
+import com.baidu.mapapi.search.route.IndoorRouteResult;
+import com.baidu.mapapi.search.route.MassTransitRouteResult;
+import com.baidu.mapapi.search.route.OnGetRoutePlanResultListener;
+import com.baidu.mapapi.search.route.RoutePlanSearch;
+import com.baidu.mapapi.search.route.TransitRouteResult;
+import com.baidu.mapapi.search.route.WalkingRouteResult;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -55,6 +65,7 @@ public class MainActivity extends AppCompatActivity{
     private PoiSearch mPoiSearch=null;
     private EditText mInputText=null;
     private BDLocation mCurLocation=null;
+    private RoutePlanSearch mRoutePlanSrch=null;
     class MyLocationListener extends BDAbstractLocationListener {
         private boolean isFirstLoc=true;
         private boolean autoLocation=false;
@@ -239,6 +250,52 @@ public class MainActivity extends AppCompatActivity{
                 mLocationClient.start();
             }
         });
+
+        //创建路线规划检索实例
+        mRoutePlanSrch = RoutePlanSearch.newInstance();
+        //创建路线规划检索结果监听器
+        OnGetRoutePlanResultListener routePlanSrchlistener = new OnGetRoutePlanResultListener() {
+            @Override
+            public void onGetWalkingRouteResult(WalkingRouteResult walkingRouteResult) {
+
+            }
+
+            @Override
+            public void onGetTransitRouteResult(TransitRouteResult transitRouteResult) {
+
+            }
+
+            @Override
+            public void onGetMassTransitRouteResult(MassTransitRouteResult massTransitRouteResult) {
+
+            }
+
+            @Override
+            public void onGetIndoorRouteResult(IndoorRouteResult indoorRouteResult) {
+
+            }
+
+            @Override
+            public void onGetBikingRouteResult(BikingRouteResult bikingRouteResult) {
+
+            }
+
+            @Override
+            public void onGetDrivingRouteResult(DrivingRouteResult drivingRouteResult) {
+                //创建DrivingRouteOverlay实例
+                DrivingRouteOverlay overlay = new DrivingRouteOverlay(mMapView.getMap());
+                for(DrivingRouteLine routeLine:drivingRouteResult.getRouteLines()
+                     ) {
+                    //为DrivingRouteOverlay实例设置数据
+                    overlay.setData(routeLine);
+                    //在地图上绘制DrivingRouteOverlay
+                    overlay.addToMap();
+
+                }
+            }
+        };
+        //设置路线规划检索监听器
+        mRoutePlanSrch.setOnGetRoutePlanResultListener(routePlanSrchlistener);
     }
 
     @Override
