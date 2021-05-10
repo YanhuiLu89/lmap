@@ -351,5 +351,12 @@ public class MainActivity extends AppCompatActivity{
              listView.setVisibility(View.GONE);
      }
      return super.dispatchTouchEvent(ev);
- }
+    }
+
+    public BDLocation curLocation() {
+        return mCurLocation;
+    }
+    public RoutePlanSearch routePlanSearch() {
+        return mRoutePlanSrch;
+    }
 }

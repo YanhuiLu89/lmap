@@ -11,8 +11,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.baidu.location.BDLocation;
+import com.baidu.location.Poi;
 import com.baidu.mapapi.search.core.PoiInfo;
+import com.baidu.mapapi.search.route.DrivingRoutePlanOption;
 import com.baidu.mapapi.search.route.PlanNode;
+import com.baidu.mapapi.search.route.RoutePlanSearch;
 
 import java.util.List;
 
@@ -36,11 +40,18 @@ public class PoiAdapter extends ArrayAdapter<PoiInfo> {
         goBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PlanNode stNode = PlanNode.withCityNameAndPlaceName(poi.city, poi.name);
-                PlanNode enNode = PlanNode.withCityNameAndPlaceName(poi.city, poi.name);
-                mSearch.drivingSearch((new DrivingRoutePlanOption())
-                        .from(stNode)
-                        .to(enNode));
+                MainActivity mainActivity=(MainActivity)getContext();
+                BDLocation curLocation=mainActivity.curLocation();
+                List<Poi> curLocaPoiList=curLocation.getPoiList();
+                if(curLocaPoiList.size()>0)
+                {
+                    PlanNode stNode = PlanNode.withCityNameAndPlaceName(curLocation.getCity(), curLocaPoiList.get(0).getName());
+                    PlanNode enNode = PlanNode.withCityNameAndPlaceName(poi.city, poi.name);
+                    RoutePlanSearch routePlanSearch=mainActivity.routePlanSearch();
+                    routePlanSearch.drivingSearch((new DrivingRoutePlanOption())
+                            .from(stNode)
+                            .to(enNode));
+                }
             }
         });
         return view;
