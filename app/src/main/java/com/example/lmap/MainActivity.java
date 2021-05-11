@@ -284,13 +284,17 @@ public class MainActivity extends AppCompatActivity{
             public void onGetDrivingRouteResult(DrivingRouteResult drivingRouteResult) {
                 //创建DrivingRouteOverlay实例
                 DrivingRouteOverlay overlay = new DrivingRouteOverlay(mMapView.getMap());
-                for(DrivingRouteLine routeLine:drivingRouteResult.getRouteLines()
-                     ) {
-                    //为DrivingRouteOverlay实例设置数据
-                    overlay.setData(routeLine);
-                    //在地图上绘制DrivingRouteOverlay
-                    overlay.addToMap();
+                List<DrivingRouteLine> routelines=drivingRouteResult.getRouteLines();
+                if(routelines!=null&&routelines.size()>0)
+                {
+                    for(DrivingRouteLine routeLine:routelines
+                    ) {
+                        //为DrivingRouteOverlay实例设置数据
+                        overlay.setData(routeLine);
+                        //在地图上绘制DrivingRouteOverlay
+                        overlay.addToMap();
 
+                    }
                 }
             }
         };

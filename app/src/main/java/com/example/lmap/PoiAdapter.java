@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.Poi;
+import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.search.core.PoiInfo;
 import com.baidu.mapapi.search.route.DrivingRoutePlanOption;
 import com.baidu.mapapi.search.route.PlanNode;
@@ -42,16 +43,12 @@ public class PoiAdapter extends ArrayAdapter<PoiInfo> {
             public void onClick(View v) {
                 MainActivity mainActivity=(MainActivity)getContext();
                 BDLocation curLocation=mainActivity.curLocation();
-                List<Poi> curLocaPoiList=curLocation.getPoiList();
-                if(curLocaPoiList.size()>0)
-                {
-                    PlanNode stNode = PlanNode.withCityNameAndPlaceName(curLocation.getCity(), curLocaPoiList.get(0).getName());
-                    PlanNode enNode = PlanNode.withCityNameAndPlaceName(poi.city, poi.name);
-                    RoutePlanSearch routePlanSearch=mainActivity.routePlanSearch();
-                    routePlanSearch.drivingSearch((new DrivingRoutePlanOption())
-                            .from(stNode)
-                            .to(enNode));
-                }
+                PlanNode stNode = PlanNode.withLocation(new LatLng(curLocation.getLatitude(), curLocation.getLongitude()));
+                PlanNode enNode = PlanNode.withLocation(poi.location);
+                RoutePlanSearch routePlanSearch=mainActivity.routePlanSearch();
+                routePlanSearch.drivingSearch((new DrivingRoutePlanOption())
+                        .from(stNode)
+                        .to(enNode));
             }
         });
         return view;
