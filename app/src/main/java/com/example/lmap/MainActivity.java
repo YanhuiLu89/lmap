@@ -295,6 +295,10 @@ public class MainActivity extends AppCompatActivity{
                         overlay.addToMap();
 
                     }
+
+                    //a关闭搜索结果
+                    ListView listView = findViewById(R.id.searchResult);
+                    listView.setVisibility(View.GONE);
                 }
             }
         };
