@@ -293,7 +293,7 @@ public class MainActivity extends AppCompatActivity{
                         overlay.setData(routeLine);
                         //在地图上绘制DrivingRouteOverlay
                         overlay.addToMap();
-
+                        overlay.zoomToSpan();
                     }
 
                     //a关闭搜索结果
