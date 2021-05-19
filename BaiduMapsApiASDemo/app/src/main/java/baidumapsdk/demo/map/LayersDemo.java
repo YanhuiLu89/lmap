@@ -38,19 +38,15 @@ public class LayersDemo extends Activity {
      */
     public void setMapMode(View view) {
         boolean checked = ((RadioButton) view).isChecked();
-        switch (view.getId()) {
-            case R.id.normal:
-                if (checked) {
-                    mBaiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
-                }
-                break;
-            case R.id.statellite:
-                if (checked) {
-                    mBaiduMap.setMapType(BaiduMap.MAP_TYPE_SATELLITE);
-                }
-                break;
-            default:
-                break;
+        int id = view.getId();
+        if (id == R.id.normal) {
+            if (checked) {
+                mBaiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
+            }
+        } else if (id == R.id.statellite) {
+            if (checked) {
+                mBaiduMap.setMapType(BaiduMap.MAP_TYPE_SATELLITE);
+            }
         }
     }
 

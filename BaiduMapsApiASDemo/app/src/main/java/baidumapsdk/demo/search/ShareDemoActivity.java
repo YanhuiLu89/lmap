@@ -229,29 +229,23 @@ public class ShareDemoActivity extends Activity implements
 
     public void setRouteMode(View view) {
         boolean checked = ((RadioButton) view).isChecked();
-        switch (view.getId()) {
-            case R.id.foot:
-                if (checked) {
-                    mRouteShareMode = RouteShareMode.FOOT_ROUTE_SHARE_MODE;
-                }
-                break;
-            case R.id.cycle:
-                if (checked) {
-                    mRouteShareMode = RouteShareMode.CYCLE_ROUTE_SHARE_MODE;
-                }
-                break;
-            case R.id.car:
-                if (checked) {
-                    mRouteShareMode = RouteShareMode.CAR_ROUTE_SHARE_MODE;
-                }
-                break;
-            case R.id.bus:
-                if (checked) {
-                    mRouteShareMode = RouteShareMode.BUS_ROUTE_SHARE_MODE;
-                }
-                break;
-            default:
-                break;
+        int id = view.getId();
+        if (id == R.id.foot) {
+            if (checked) {
+                mRouteShareMode = RouteShareMode.FOOT_ROUTE_SHARE_MODE;
+            }
+        } else if (id == R.id.cycle) {
+            if (checked) {
+                mRouteShareMode = RouteShareMode.CYCLE_ROUTE_SHARE_MODE;
+            }
+        } else if (id == R.id.car) {
+            if (checked) {
+                mRouteShareMode = RouteShareMode.CAR_ROUTE_SHARE_MODE;
+            }
+        } else if (id == R.id.bus) {
+            if (checked) {
+                mRouteShareMode = RouteShareMode.BUS_ROUTE_SHARE_MODE;
+            }
         }
     }
 

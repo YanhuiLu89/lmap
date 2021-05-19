@@ -112,40 +112,19 @@ public class MarkerAnimationDemo extends Activity {
      * @param view
      */
     public void startAnimation(View view) {
-        switch (view.getId()) {
-            case R.id.btn_rotate:
-                //旋转动画
-                startRotateAnimation();
-                break;
-
-            case R.id.btn_scale:
-                //缩放动画
-                startScaleAnimation();
-                break;
-
-            case R.id.btn_transformation:
-                //平移动画
-                startTransformation();
-                break;
-
-            case R.id.btn_alpha:
-                //透明动画
-                startAlphaAnimation();
-                break;
-
-            case R.id.btn_singleScale:
-                //组合动画
-                startSingleScaleAnimation();
-                break;
-
-            case R.id.btn_animationSet:
-                //组合动画
-                startAnimationSet();
-                break;
-
-            default:
-                break;
-
+        int id = view.getId();
+        if (id == R.id.btn_rotate) {//旋转动画
+            startRotateAnimation();
+        } else if (id == R.id.btn_scale) {//缩放动画
+            startScaleAnimation();
+        } else if (id == R.id.btn_transformation) {//平移动画
+            startTransformation();
+        } else if (id == R.id.btn_alpha) {//透明动画
+            startAlphaAnimation();
+        } else if (id == R.id.btn_singleScale) {//组合动画
+            startSingleScaleAnimation();
+        } else if (id == R.id.btn_animationSet) {//组合动画
+            startAnimationSet();
         }
 
     }
