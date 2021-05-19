@@ -1,2 +1,4 @@
+include ':demolib'
 include ':app'
+project(':demolib').projectDir = new File(rootDir, 'BaiduMapsApiASDemo/app/')
 rootProject.name = "lmap"
