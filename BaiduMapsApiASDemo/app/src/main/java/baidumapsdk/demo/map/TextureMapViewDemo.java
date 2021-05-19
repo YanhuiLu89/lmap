@@ -5,7 +5,7 @@ package baidumapsdk.demo.map;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.v4.view.ViewPager;
+import androidx.viewpager.widget.ViewPager;
 import android.widget.TabHost;
 
 import com.baidu.mapapi.map.BaiduMap;
