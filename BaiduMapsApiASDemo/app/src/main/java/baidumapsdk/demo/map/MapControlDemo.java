@@ -104,11 +104,11 @@ public class MapControlDemo extends Activity {
             /**
              * 单击地图中的POI点
              */
-            public boolean onMapPoiClick(MapPoi poi) {
+            public void onMapPoiClick(MapPoi poi) {
                 touchType = "单击POI点";
                 currentPt = poi.getPosition();
                 updateMapState();
-                return false;
+                return;
             }
         });
         mBaiduMap.setOnMapLongClickListener(new OnMapLongClickListener() {

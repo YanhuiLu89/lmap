@@ -219,7 +219,7 @@ public class BusLineSearchDemo extends FragmentActivity implements
     }
 
     @Override
-    public boolean onMapPoiClick(MapPoi poi) {
-        return false;
+    public void onMapPoiClick(MapPoi poi) {
+        return;
     }
 }

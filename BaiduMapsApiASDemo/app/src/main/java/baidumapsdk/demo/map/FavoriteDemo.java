@@ -314,8 +314,8 @@ public class FavoriteDemo extends Activity implements OnMapLongClickListener,
     }
 
     @Override
-    public boolean onMapPoiClick(MapPoi poi) {
-        return false;
+    public void onMapPoiClick(MapPoi poi) {
+        return;
     }
 
 }

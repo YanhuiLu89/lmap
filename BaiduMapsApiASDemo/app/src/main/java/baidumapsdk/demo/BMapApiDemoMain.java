@@ -48,7 +48,7 @@ import baidumapsdk.demo.search.GeoCoderDemo;
 import baidumapsdk.demo.search.PoiSearchDemo;
 import baidumapsdk.demo.search.ShareDemo;
 import baidumapsdk.demo.search.IndoorSearchDemo;
-import baidumapsdk.demo.cloud.CloudSearchDemo;
+//import baidumapsdk.demo.cloud.CloudSearchDemo;
 import baidumapsdk.demo.util.OpenBaiduMap;
 
 
@@ -155,8 +155,8 @@ public class BMapApiDemoMain extends Activity {
                     OpenBaiduMap.class),
             new DemoInfo(R.string.demo_title_favorite,
                     R.string.demo_desc_favorite, FavoriteDemo.class),
-            new DemoInfo(R.string.demo_title_cloud, R.string.demo_desc_cloud,
-                    CloudSearchDemo.class),
+//            new DemoInfo(R.string.demo_title_cloud, R.string.demo_desc_cloud,
+//                    CloudSearchDemo.class),
             new DemoInfo(R.string.demo_title_opengl, R.string.demo_desc_opengl,
                     OpenglDemo.class),
             new DemoInfo(R.string.demo_title_cluster, R.string.demo_desc_cluster, MarkerClusterDemo.class),

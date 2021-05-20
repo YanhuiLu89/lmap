@@ -761,8 +761,8 @@ public class RoutePlanDemo extends Activity implements BaiduMap.OnMapClickListen
     }
 
     @Override
-    public boolean onMapPoiClick(MapPoi poi) {
-        return false;
+    public void onMapPoiClick(MapPoi poi) {
+        return;
     }
 
     @Override
