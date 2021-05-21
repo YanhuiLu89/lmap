@@ -8,6 +8,7 @@ import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
+import com.baidu.mapapi.bikenavi.BikeNavigateHelper;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
@@ -32,11 +33,14 @@ import com.baidu.mapapi.search.route.OnGetRoutePlanResultListener;
 import com.baidu.mapapi.search.route.RoutePlanSearch;
 import com.baidu.mapapi.search.route.TransitRouteResult;
 import com.baidu.mapapi.search.route.WalkingRouteResult;
+import com.baidu.navisdk.adapter.BaiduNaviManagerFactory;
+import com.baidu.navisdk.adapter.IBaiduNaviManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.os.Environment;
 import android.view.DragEvent;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -53,6 +57,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.io.File;
 import java.util.List;
 
 import static com.baidu.mapapi.map.BaiduMap.MAP_TYPE_NONE;
@@ -289,6 +294,7 @@ public class MainActivity extends AppCompatActivity{
                 {
                     for(DrivingRouteLine routeLine:routelines
                     ) {
+                        BikeNavigateHelper mNaviHelper = BikeNavigateHelper.getInstance();
                         //为DrivingRouteOverlay实例设置数据
                         overlay.setData(routeLine);
                         //在地图上绘制DrivingRouteOverlay
@@ -304,6 +310,37 @@ public class MainActivity extends AppCompatActivity{
         };
         //设置路线规划检索监听器
         mRoutePlanSrch.setOnGetRoutePlanResultListener(routePlanSrchlistener);
+
+        //导航初始化
+        File sdDir = null;
+        boolean sdCardExist = Environment.getExternalStorageState()
+                .equals(android.os.Environment.MEDIA_MOUNTED);//判断sd卡是否存在
+        if(sdCardExist)
+        {
+            sdDir = Environment.getExternalStorageDirectory();//获取跟目录
+        }
+        BaiduNaviManagerFactory.getBaiduNaviManager().init(getApplicationContext(), sdDir.toString(), "lmap",
+                new IBaiduNaviManager.INaviInitListener() {
+                    @Override
+                    public void onAuthResult(int i, String s) {
+
+                    }
+
+                    @Override
+                    public void initStart() {
+
+                    }
+
+                    @Override
+                    public void initSuccess() {
+
+                    }
+
+                    @Override
+                    public void initFailed(int i) {
+
+                    }
+                });
     }
 
     @Override

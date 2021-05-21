@@ -17,6 +17,13 @@
     <!-- 这个权限用于访问GPS定位 -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
+    <!--获取Wi-Fi状态，避免产生不必要的网络请求 -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <!-- 用于ugc事件上报拍照录像 -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <!-- 用于ugc事件上报录音 -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+
     <application
         android:name="com.example.lmap.MapApplication"
         android:allowBackup="true"

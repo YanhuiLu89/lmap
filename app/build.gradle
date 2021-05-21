@@ -10,22 +10,27 @@ android {
             storePassword '123456'
             storeFile file('C:\\Users\\Administrator\\.android\\debug.keystore')
         }
+        useLibrary 'org.apache.http.legacy'
     }
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
     sourceSets {
         main {
-            jniLibs.srcDir 'libs'
+            jniLibs.srcDirs = ['libs']
         }
     }
     defaultConfig {
         applicationId "com.example.lmap"
-        minSdkVersion 16
+        minSdkVersion 18
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        // 避免"64K 引用限制"
+        multiDexEnabled true
+        // 导航SDK内部使用了annotationProcessor，需要添加下面代码，防止编译异常
+        javaCompileOptions { annotationProcessorOptions { includeCompileClasspath = true } }
     }
 
     buildTypes {
@@ -51,9 +56,16 @@ dependencies {
     implementation files('libs\\BaiduLBS_Android.jar')
     implementation files('libs\\intellij_annotations.jar')
     implementation files('libs\\javapoet-1.9.0.jar')
+    implementation files('libs\\NaviTts.aar')
+    implementation files('libs\\onsdk_all.aar')
     implementation project(path: ':demolib')
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    implementation 'android.arch.lifecycle:extensions:1.1.1'
 }
