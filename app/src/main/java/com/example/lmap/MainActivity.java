@@ -7,6 +7,7 @@ import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
+import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.bikenavi.BikeNavigateHelper;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.MapStatus;
@@ -171,6 +172,7 @@ public class MainActivity extends AppCompatActivity{
     };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SDKInitializer.initialize(getApplicationContext());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //获取地图控件引用
@@ -323,17 +325,17 @@ public class MainActivity extends AppCompatActivity{
         {
             sdDir = Environment.getExternalStorageDirectory();//获取跟目录
         }
-        BaiduNaviManagerFactory.getBaiduNaviManager().init(getApplicationContext(), sdDir.toString(), "lmap",
+        BaiduNaviManagerFactory.getBaiduNaviManager().init(getApplicationContext(), sdDir.toString(), "com.example.lmap",
                 new IBaiduNaviManager.INaviInitListener() {
                     @Override
                     public void onAuthResult(int i, String s) {
                         if(i==0)
                         {
-                            Toast.makeText(MainActivity.this, "key校验成功!", Toast.LENGTH_SHORT).show();
+                           Toast.makeText(MainActivity.this, "key校验成功!", Toast.LENGTH_SHORT).show();
                         }
                         else if(i==1)
                         {
-                            Toast.makeText(MainActivity.this, "key校验失败, " + s, Toast.LENGTH_SHORT).show();
+                          Toast.makeText(MainActivity.this, "key校验失败, " + s, Toast.LENGTH_SHORT).show();
                         }
                     }
 
@@ -358,6 +360,7 @@ public class MainActivity extends AppCompatActivity{
                 });
 
         //管理专业导航生命周期
+        mNaviView=new View(getBaseContext());
         Bundle bundle = new Bundle();
         // IS_REALNAVI代表导航类型，true表示真实导航，false表示模拟导航，默认是true
         bundle.putBoolean(BNaviCommonParams.ProGuideKey.IS_REALNAVI, true);
@@ -365,10 +368,10 @@ public class MainActivity extends AppCompatActivity{
         bundle.putBoolean(BNaviCommonParams.ProGuideKey.IS_SUPPORT_FULL_SCREEN, true);
         BNGuideConfig config = new BNGuideConfig.Builder()
                 .params(bundle)
-                .addViewCallback(new IBNRouteGuideManager.NaviAddViewCallback() {
+                .addLeftViewCallback(new IBNRouteGuideManager.NaviAddViewCallback() {
                     @Override
                     public int getViewHeight() {
-                        return 32;
+                        return 600;
                     }
 
                     @Override
@@ -377,6 +380,18 @@ public class MainActivity extends AppCompatActivity{
                     }
 
                 })
+                .addBottomViewCallback(new IBNRouteGuideManager.NaviAddViewCallback(){
+                   @Override
+                   public int getViewHeight() {
+                       return 300;
+                   }
+
+                   @Override
+                   public View getAddedView() {
+                       return mNaviView;
+                   }
+               }
+                )
                 .build();
         BaiduNaviManagerFactory.getRouteGuideManager().onCreate(this, config);
     }
@@ -396,7 +411,7 @@ public class MainActivity extends AppCompatActivity{
             sdDir = Environment.getExternalStorageDirectory();//获取跟目录
         }
         BNTTsInitConfig.Builder builder=new BNTTsInitConfig.Builder();
-        builder.context(getApplicationContext()).sdcardRootPath(sdDir.toString()).appFolderName("lmap").appId(("tts appid"));
+        builder.context(getApplicationContext()).sdcardRootPath(sdDir.toString()).appFolderName("com.example.lmap").appId(("tts appid"));
         BaiduNaviManagerFactory.getTTSManager().initTTS( builder.build());
 
         // 注册同步内置tts状态回调
@@ -434,13 +449,13 @@ public class MainActivity extends AppCompatActivity{
         super.onPause();
         //在activity执行onPause时执行mMapView. onPause ()，实现地图生命周期管理
         mMapView.onPause();
-        BaiduNaviManagerFactory.getRouteGuideManager().onPause();
+      //  BaiduNaviManagerFactory.getRouteGuideManager().onPause();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        BaiduNaviManagerFactory.getRouteGuideManager().onStop();
+    //    BaiduNaviManagerFactory.getRouteGuideManager().onStop();
     }
     @Override
     protected void onDestroy() {
@@ -449,7 +464,7 @@ public class MainActivity extends AppCompatActivity{
         mLocationClient.stop();
         mMapView.getMap().setMyLocationEnabled(false);
         mMapView.onDestroy();
-        BaiduNaviManagerFactory.getRouteGuideManager().onDestroy(false);
+      //  BaiduNaviManagerFactory.getRouteGuideManager().onDestroy(false);
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

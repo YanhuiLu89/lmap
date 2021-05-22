@@ -15,7 +15,7 @@ android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
     sourceSets {
-        main {
+        main() {
             jniLibs.srcDirs = ['libs']
         }
     }
