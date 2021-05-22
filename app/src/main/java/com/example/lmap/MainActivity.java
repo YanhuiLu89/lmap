@@ -1,6 +1,7 @@
 
 package com.example.lmap;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import com.baidu.location.BDAbstractLocationListener;
@@ -14,6 +15,7 @@ import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationData;
+import com.baidu.mapapi.map.Text;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.overlayutil.DrivingRouteOverlay;
 import com.baidu.mapapi.search.core.PoiInfo;
@@ -34,13 +36,16 @@ import com.baidu.mapapi.search.route.RoutePlanSearch;
 import com.baidu.mapapi.search.route.TransitRouteResult;
 import com.baidu.mapapi.search.route.WalkingRouteResult;
 import com.baidu.navisdk.adapter.BaiduNaviManagerFactory;
+import com.baidu.navisdk.adapter.IBNTTSManager;
 import com.baidu.navisdk.adapter.IBaiduNaviManager;
+import com.baidu.navisdk.adapter.struct.BNTTsInitConfig;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.os.Environment;
+import android.util.Log;
 import android.view.DragEvent;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -56,10 +61,12 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.util.List;
 
+import static com.baidu.mapapi.BMapManager.getContext;
 import static com.baidu.mapapi.map.BaiduMap.MAP_TYPE_NONE;
 import static com.baidu.mapapi.map.BaiduMap.MAP_TYPE_NORMAL;
 import static com.baidu.mapapi.map.BaiduMap.MAP_TYPE_SATELLITE;
@@ -323,7 +330,14 @@ public class MainActivity extends AppCompatActivity{
                 new IBaiduNaviManager.INaviInitListener() {
                     @Override
                     public void onAuthResult(int i, String s) {
-
+                        if(i==0)
+                        {
+                            Toast.makeText(MainActivity.this, "key校验成功!", Toast.LENGTH_SHORT).show();
+                        }
+                        else if(i==1)
+                        {
+                            Toast.makeText(MainActivity.this, "key校验失败, " + s, Toast.LENGTH_SHORT).show();
+                        }
                     }
 
                     @Override
@@ -333,14 +347,52 @@ public class MainActivity extends AppCompatActivity{
 
                     @Override
                     public void initSuccess() {
+                        Toast.makeText(MainActivity.this, "百度导航引擎初始化成功", Toast.LENGTH_SHORT).show();
+                        // 初始化tts
+                        initTTs();
 
                     }
 
                     @Override
                     public void initFailed(int i) {
+                        Toast.makeText(MainActivity.this, "百度导航引擎初始化失败", Toast.LENGTH_SHORT).show();
 
                     }
                 });
+    }
+
+    private void initTTs() {
+        File sdDir = null;
+        boolean sdCardExist = Environment.getExternalStorageState()
+                .equals(android.os.Environment.MEDIA_MOUNTED);//判断sd卡是否存在
+        if(sdCardExist)
+        {
+            sdDir = Environment.getExternalStorageDirectory();//获取跟目录
+        }
+        BNTTsInitConfig.Builder builder=new BNTTsInitConfig.Builder();
+        builder.context(getApplicationContext()).sdcardRootPath(sdDir.toString()).appFolderName("lmap").appId(("tts appid"));
+        BaiduNaviManagerFactory.getTTSManager().initTTS( builder.build());
+
+        // 注册同步内置tts状态回调
+        BaiduNaviManagerFactory.getTTSManager().setOnTTSStateChangedListener(
+                new IBNTTSManager.IOnTTSPlayStateChangedListener() {
+                    @Override
+                    public void onPlayStart() {
+                        Log.e("lmap", "ttsCallback.onPlayStart");
+                    }
+
+                    @Override
+                    public void onPlayEnd(String speechId) {
+                        Log.e("lmap", "ttsCallback.onPlayEnd");
+                    }
+
+                    @Override
+                    public void onPlayError(int code, String message) {
+                        Log.e("lmap", "ttsCallback.onPlayError");
+                    }
+                }
+        );
+
     }
 
     @Override
