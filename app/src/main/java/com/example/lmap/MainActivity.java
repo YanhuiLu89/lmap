@@ -1,12 +1,10 @@
 
 package com.example.lmap;
 
-import android.content.Context;
 import android.os.Bundle;
 
 import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
-import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.bikenavi.BikeNavigateHelper;
@@ -15,7 +13,6 @@ import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationData;
-import com.baidu.mapapi.map.Text;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.overlayutil.DrivingRouteOverlay;
 import com.baidu.mapapi.search.core.PoiInfo;
@@ -35,18 +32,19 @@ import com.baidu.mapapi.search.route.OnGetRoutePlanResultListener;
 import com.baidu.mapapi.search.route.RoutePlanSearch;
 import com.baidu.mapapi.search.route.TransitRouteResult;
 import com.baidu.mapapi.search.route.WalkingRouteResult;
+import com.baidu.navisdk.adapter.BNaviCommonParams;
 import com.baidu.navisdk.adapter.BaiduNaviManagerFactory;
+import com.baidu.navisdk.adapter.IBNRouteGuideManager;
 import com.baidu.navisdk.adapter.IBNTTSManager;
 import com.baidu.navisdk.adapter.IBaiduNaviManager;
+import com.baidu.navisdk.adapter.struct.BNGuideConfig;
 import com.baidu.navisdk.adapter.struct.BNTTsInitConfig;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.os.Environment;
 import android.util.Log;
-import android.view.DragEvent;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -56,7 +54,6 @@ import android.view.MenuItem;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -66,7 +63,6 @@ import android.widget.Toast;
 import java.io.File;
 import java.util.List;
 
-import static com.baidu.mapapi.BMapManager.getContext;
 import static com.baidu.mapapi.map.BaiduMap.MAP_TYPE_NONE;
 import static com.baidu.mapapi.map.BaiduMap.MAP_TYPE_NORMAL;
 import static com.baidu.mapapi.map.BaiduMap.MAP_TYPE_SATELLITE;
@@ -78,6 +74,7 @@ public class MainActivity extends AppCompatActivity{
     private EditText mInputText=null;
     private BDLocation mCurLocation=null;
     private RoutePlanSearch mRoutePlanSrch=null;
+    private View mNaviView=null;
     class MyLocationListener extends BDAbstractLocationListener {
         private boolean isFirstLoc=true;
         private boolean autoLocation=false;
@@ -359,6 +356,35 @@ public class MainActivity extends AppCompatActivity{
 
                     }
                 });
+
+        //管理专业导航生命周期
+        Bundle bundle = new Bundle();
+        // IS_REALNAVI代表导航类型，true表示真实导航，false表示模拟导航，默认是true
+        bundle.putBoolean(BNaviCommonParams.ProGuideKey.IS_REALNAVI, true);
+        // IS_SUPPORT_FULL_SCREEN代表是否沉浸式，默认是true
+        bundle.putBoolean(BNaviCommonParams.ProGuideKey.IS_SUPPORT_FULL_SCREEN, true);
+        BNGuideConfig config = new BNGuideConfig.Builder()
+                .params(bundle)
+                .addViewCallback(new IBNRouteGuideManager.NaviAddViewCallback() {
+                    @Override
+                    public int getViewHeight() {
+                        return 32;
+                    }
+
+                    @Override
+                    public View getAddedView() {
+                        return mNaviView;
+                    }
+
+                })
+                .build();
+        BaiduNaviManagerFactory.getRouteGuideManager().onCreate(this, config);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        BaiduNaviManagerFactory.getRouteGuideManager().onStart();
     }
 
     private void initTTs() {
@@ -400,6 +426,7 @@ public class MainActivity extends AppCompatActivity{
         super.onResume();
         //在activity执行onResume时执行mMapView. onResume ()，实现地图生命周期管理
         mMapView.onResume();
+        BaiduNaviManagerFactory.getRouteGuideManager().onResume();
     }
 
     @Override
@@ -407,8 +434,14 @@ public class MainActivity extends AppCompatActivity{
         super.onPause();
         //在activity执行onPause时执行mMapView. onPause ()，实现地图生命周期管理
         mMapView.onPause();
+        BaiduNaviManagerFactory.getRouteGuideManager().onPause();
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        BaiduNaviManagerFactory.getRouteGuideManager().onStop();
+    }
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -416,6 +449,7 @@ public class MainActivity extends AppCompatActivity{
         mLocationClient.stop();
         mMapView.getMap().setMyLocationEnabled(false);
         mMapView.onDestroy();
+        BaiduNaviManagerFactory.getRouteGuideManager().onDestroy(false);
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
