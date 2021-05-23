@@ -3,6 +3,7 @@ package com.example.lmap;
 
 import android.os.Bundle;
 
+import com.baidu.baidunavis.baseline.BNOuterMapViewManager;
 import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
@@ -40,6 +41,7 @@ import com.baidu.navisdk.adapter.IBNTTSManager;
 import com.baidu.navisdk.adapter.IBaiduNaviManager;
 import com.baidu.navisdk.adapter.struct.BNGuideConfig;
 import com.baidu.navisdk.adapter.struct.BNTTsInitConfig;
+import com.baidu.navisdk.adapter.struct.BNaviInitConfig;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -76,6 +78,9 @@ public class MainActivity extends AppCompatActivity{
     private BDLocation mCurLocation=null;
     private RoutePlanSearch mRoutePlanSrch=null;
     private View mNaviView=null;
+    private File mSDCardPath=null;
+    private static final String APP_FOLDER_NAME = "lmap";
+
     class MyLocationListener extends BDAbstractLocationListener {
         private boolean isFirstLoc=true;
         private boolean autoLocation=false;
@@ -325,8 +330,15 @@ public class MainActivity extends AppCompatActivity{
         {
             sdDir = Environment.getExternalStorageDirectory();//获取跟目录
         }
-        BaiduNaviManagerFactory.getBaiduNaviManager().init(getApplicationContext(), sdDir.toString(), "com.example.lmap",
-                new IBaiduNaviManager.INaviInitListener() {
+        
+        if(!initDirs())
+        {
+            return;
+        }
+
+        BNaviInitConfig navInitCfg= new BNaviInitConfig.Builder().sdcardRootPath(mSDCardPath.toString())
+                .appFolderName(APP_FOLDER_NAME)
+                .naviInitListener(new IBaiduNaviManager.INaviInitListener() {
                     @Override
                     public void onAuthResult(int i, String s) {
                         if(i==0)
@@ -357,8 +369,8 @@ public class MainActivity extends AppCompatActivity{
                         Toast.makeText(MainActivity.this, "百度导航引擎初始化失败", Toast.LENGTH_SHORT).show();
 
                     }
-                });
-
+                }).build();
+        BaiduNaviManagerFactory.getBaiduNaviManager().init(getApplicationContext(),navInitCfg);
         //管理专业导航生命周期
         mNaviView=new View(getBaseContext());
         Bundle bundle = new Bundle();
@@ -396,9 +408,28 @@ public class MainActivity extends AppCompatActivity{
         BaiduNaviManagerFactory.getRouteGuideManager().onCreate(this, config);
     }
 
+    private boolean initDirs() {
+        mSDCardPath = Environment.getStorageDirectory();;
+        if (mSDCardPath == null) {
+            return false;
+        }
+        File f = new File(mSDCardPath, APP_FOLDER_NAME);
+        if (!f.exists()) {
+            try {
+                f.mkdir();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+        return true;
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
+        mMapView = (MapView) findViewById(R.id.bmapView);
+        MapView mapView= BNOuterMapViewManager.getInstance().getMapView();
         BaiduNaviManagerFactory.getRouteGuideManager().onStart();
     }
 
@@ -411,7 +442,7 @@ public class MainActivity extends AppCompatActivity{
             sdDir = Environment.getExternalStorageDirectory();//获取跟目录
         }
         BNTTsInitConfig.Builder builder=new BNTTsInitConfig.Builder();
-        builder.context(getApplicationContext()).sdcardRootPath(sdDir.toString()).appFolderName("com.example.lmap").appId(("tts appid"));
+        builder.context(getApplicationContext()).sdcardRootPath(mSDCardPath.toString()).appFolderName(APP_FOLDER_NAME).appId(("tts appid"));
         BaiduNaviManagerFactory.getTTSManager().initTTS( builder.build());
 
         // 注册同步内置tts状态回调
@@ -441,7 +472,7 @@ public class MainActivity extends AppCompatActivity{
         super.onResume();
         //在activity执行onResume时执行mMapView. onResume ()，实现地图生命周期管理
         mMapView.onResume();
-        BaiduNaviManagerFactory.getRouteGuideManager().onResume();
+       // BaiduNaviManagerFactory.getRouteGuideManager().onResume();
     }
 
     @Override
