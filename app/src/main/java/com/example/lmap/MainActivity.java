@@ -19,6 +19,7 @@ import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.overlayutil.DrivingRouteOverlay;
 import com.baidu.mapapi.search.core.PoiInfo;
+import com.baidu.mapapi.search.core.RouteNode;
 import com.baidu.mapapi.search.poi.OnGetPoiSearchResultListener;
 import com.baidu.mapapi.search.poi.PoiCitySearchOption;
 import com.baidu.mapapi.search.poi.PoiDetailResult;
@@ -88,6 +89,7 @@ public class MainActivity extends AppCompatActivity{
     private View mNaviView=null;
     private File mSDCardPath=null;
     private static final String APP_FOLDER_NAME = "lmap";
+    private PoiInfo mDestation=null;
 
     class MyLocationListener extends BDAbstractLocationListener {
         private boolean isFirstLoc=true;
@@ -329,6 +331,10 @@ public class MainActivity extends AppCompatActivity{
                     startNav.setVisibility(View.VISIBLE);
 
                 }
+                else
+                {
+                    mDestation=null;
+                }
             }
         };
         //设置路线规划检索监听器
@@ -424,18 +430,19 @@ public class MainActivity extends AppCompatActivity{
         startNav.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mRoutePlanSrch.op()
+                if(mCurLocation==null||mDestation==null)
+                    return;
                 BNRoutePlanNode sNode = new BNRoutePlanNode.Builder()
-                        .latitude(40.05087)
-                        .longitude(116.30142)
-                        .name("百度大厦")
-                        .description("百度大厦")
+                        .latitude(mCurLocation.getLatitude())
+                        .longitude(mCurLocation.getLongitude())
+                        .name("我的位置")
+                        .description("我的位置")
                         .build();
                 BNRoutePlanNode eNode = new BNRoutePlanNode.Builder()
-                        .latitude(39.90882)
-                        .longitude(116.39750)
-                        .name("北京天安门")
-                        .description("北京天安门")
+                        .latitude(mDestation.getLocation().latitude)
+                        .longitude(mDestation.getLocation().longitude)
+                        .name(mDestation.name)
+                        .description(mDestation.name)
                         .build();
                 List<BNRoutePlanNode> list = new ArrayList<>();
                 list.add(sNode);
@@ -464,7 +471,7 @@ public class MainActivity extends AppCompatActivity{
                                         Toast.makeText(MainActivity.this.getApplicationContext(),
                                                 "算路成功准备进入导航", Toast.LENGTH_SHORT).show();
                                         Intent intent = new Intent(MainActivity.this,
-                                                MainActivity.class);
+                                                DemoGuideActivity.class);
                                         startActivity(intent);
                                         break;
                                     default:
@@ -549,13 +556,13 @@ public class MainActivity extends AppCompatActivity{
         super.onPause();
         //在activity执行onPause时执行mMapView. onPause ()，实现地图生命周期管理
         mMapView.onPause();
-      //  BaiduNaviManagerFactory.getRouteGuideManager().onPause();
+        BaiduNaviManagerFactory.getRouteGuideManager().onPause();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-    //    BaiduNaviManagerFactory.getRouteGuideManager().onStop();
+        BaiduNaviManagerFactory.getRouteGuideManager().onStop();
     }
     @Override
     protected void onDestroy() {
@@ -564,7 +571,7 @@ public class MainActivity extends AppCompatActivity{
         mLocationClient.stop();
         mMapView.getMap().setMyLocationEnabled(false);
         mMapView.onDestroy();
-      //  BaiduNaviManagerFactory.getRouteGuideManager().onDestroy(false);
+        BaiduNaviManagerFactory.getRouteGuideManager().onDestroy(false);
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -605,4 +612,6 @@ public class MainActivity extends AppCompatActivity{
     public RoutePlanSearch routePlanSearch() {
         return mRoutePlanSrch;
     }
+
+    public void setDestation(PoiInfo poi){mDestation=poi;}
 }

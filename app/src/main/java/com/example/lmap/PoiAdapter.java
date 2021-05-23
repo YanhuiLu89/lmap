@@ -42,6 +42,7 @@ public class PoiAdapter extends ArrayAdapter<PoiInfo> {
             @Override
             public void onClick(View v) {
                 MainActivity mainActivity=(MainActivity)getContext();
+                mainActivity.setDestation(poi);
                 BDLocation curLocation=mainActivity.curLocation();
                 PlanNode stNode = PlanNode.withLocation(new LatLng(curLocation.getLatitude(), curLocation.getLongitude()));
                 PlanNode enNode = PlanNode.withLocation(poi.location);
