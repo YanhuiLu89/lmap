@@ -1,6 +1,7 @@
 
 package com.example.lmap;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.baidu.baidunavis.baseline.BNOuterMapViewManager;
@@ -34,9 +35,11 @@ import com.baidu.mapapi.search.route.OnGetRoutePlanResultListener;
 import com.baidu.mapapi.search.route.RoutePlanSearch;
 import com.baidu.mapapi.search.route.TransitRouteResult;
 import com.baidu.mapapi.search.route.WalkingRouteResult;
+import com.baidu.navisdk.adapter.BNRoutePlanNode;
 import com.baidu.navisdk.adapter.BNaviCommonParams;
 import com.baidu.navisdk.adapter.BaiduNaviManagerFactory;
 import com.baidu.navisdk.adapter.IBNRouteGuideManager;
+import com.baidu.navisdk.adapter.IBNRoutePlanManager;
 import com.baidu.navisdk.adapter.IBNTTSManager;
 import com.baidu.navisdk.adapter.IBaiduNaviManager;
 import com.baidu.navisdk.adapter.struct.BNGuideConfig;
@@ -47,6 +50,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -57,6 +63,7 @@ import android.view.MenuItem;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -64,6 +71,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.baidu.mapapi.map.BaiduMap.MAP_TYPE_NONE;
@@ -305,17 +313,21 @@ public class MainActivity extends AppCompatActivity{
                 {
                     for(DrivingRouteLine routeLine:routelines
                     ) {
-                        BikeNavigateHelper mNaviHelper = BikeNavigateHelper.getInstance();
                         //为DrivingRouteOverlay实例设置数据
                         overlay.setData(routeLine);
                         //在地图上绘制DrivingRouteOverlay
                         overlay.addToMap();
                         overlay.zoomToSpan();
+                        routeLine.getStarting();
                     }
 
                     //a关闭搜索结果
                     ListView listView = findViewById(R.id.searchResult);
                     listView.setVisibility(View.GONE);
+                    //显示开始导航按钮
+                    Button startNav=findViewById(R.id.startnavi);
+                    startNav.setVisibility(View.VISIBLE);
+
                 }
             }
         };
@@ -406,6 +418,63 @@ public class MainActivity extends AppCompatActivity{
                 )
                 .build();
         BaiduNaviManagerFactory.getRouteGuideManager().onCreate(this, config);
+
+        //增加开始导航按钮的响应
+        Button startNav=findViewById(R.id.startnavi);
+        startNav.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mRoutePlanSrch.op()
+                BNRoutePlanNode sNode = new BNRoutePlanNode.Builder()
+                        .latitude(40.05087)
+                        .longitude(116.30142)
+                        .name("百度大厦")
+                        .description("百度大厦")
+                        .build();
+                BNRoutePlanNode eNode = new BNRoutePlanNode.Builder()
+                        .latitude(39.90882)
+                        .longitude(116.39750)
+                        .name("北京天安门")
+                        .description("北京天安门")
+                        .build();
+                List<BNRoutePlanNode> list = new ArrayList<>();
+                list.add(sNode);
+                list.add(eNode);
+                BaiduNaviManagerFactory.getRoutePlanManager().routePlanToNavi(
+                        list,
+                        IBNRoutePlanManager.RoutePlanPreference.ROUTE_PLAN_PREFERENCE_DEFAULT,
+                        null,
+                        new Handler(Looper.getMainLooper()) {
+                            @Override
+                            public void handleMessage(Message msg) {
+                                switch (msg.what) {
+                                    case IBNRoutePlanManager.MSG_NAVI_ROUTE_PLAN_START:
+                                        Toast.makeText(MainActivity.this.getApplicationContext(),
+                                                "算路开始", Toast.LENGTH_SHORT).show();
+                                        break;
+                                    case IBNRoutePlanManager.MSG_NAVI_ROUTE_PLAN_SUCCESS:
+                                        Toast.makeText(MainActivity.this.getApplicationContext(),
+                                                "算路成功", Toast.LENGTH_SHORT).show();
+                                        break;
+                                    case IBNRoutePlanManager.MSG_NAVI_ROUTE_PLAN_FAILED:
+                                        Toast.makeText(MainActivity.this.getApplicationContext(),
+                                                "算路失败", Toast.LENGTH_SHORT).show();
+                                        break;
+                                    case IBNRoutePlanManager.MSG_NAVI_ROUTE_PLAN_TO_NAVI:
+                                        Toast.makeText(MainActivity.this.getApplicationContext(),
+                                                "算路成功准备进入导航", Toast.LENGTH_SHORT).show();
+                                        Intent intent = new Intent(MainActivity.this,
+                                                MainActivity.class);
+                                        startActivity(intent);
+                                        break;
+                                    default:
+                                        // nothing
+                                        break;
+                                }
+                            }
+                        });
+            }
+        });
     }
 
     private boolean initDirs() {
