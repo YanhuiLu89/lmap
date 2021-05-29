@@ -6,4 +6,86 @@
     android:layout_height="match_parent"
     tools:context=".DemoGuideActivity">
 
+    <com.baidu.mapapi.map.MapView
+        android:id="@+id/bmapView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"  >
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="8"
+            android:orientation="vertical">
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="8"
+                android:orientation="horizontal">
+                <ImageView
+                    android:id="@+id/turnicon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"/>
+                <TextView
+                    android:id="@+id/distance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:textColor="@color/white"
+                    android:textSize="24sp" />
+                    />
+                <TextView
+                    android:id="@+id/action"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:textColor="@color/nsdk_bg_gray"
+                    android:textSize="14sp" />
+                />
+                <TextView
+                    android:id="@+id/roadname"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:textColor="@color/white"
+                    android:textSize="24sp" />
+                />
+            </LinearLayout>
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/nextdistance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:textColor="@color/white"
+                    android:textSize="12sp" />
+                <ImageView
+                    android:id="@+id/nextturnicon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"/>
+                <TextView
+                    android:id="@+id/nextaction"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:textColor="@color/nsdk_bg_gray"
+                    android:textSize="12sp" />
+                />
+                <TextView
+                    android:id="@+id/nextroadname"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:textColor="@color/white"
+                    android:textSize="12sp" />
+                />
+            </LinearLayout>
+        </LinearLayout>
+    </com.baidu.mapapi.map.MapView>
 </androidx.constraintlayout.widget.ConstraintLayout>
