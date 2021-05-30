@@ -320,6 +320,8 @@ public class MainActivity extends AppCompatActivity{
                     //显示开始导航按钮
                     Button startNav=findViewById(R.id.startnavi);
                     startNav.setVisibility(View.VISIBLE);
+                    Button simNav=findViewById(R.id.simnavi);
+                    simNav.setVisibility(View.VISIBLE);
 
                 }
                 else
@@ -386,58 +388,71 @@ public class MainActivity extends AppCompatActivity{
         startNav.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mCurLocation==null||mDestation==null)
-                    return;
-                BNRoutePlanNode sNode = new BNRoutePlanNode.Builder()
-                        .latitude(mCurLocation.getLatitude())
-                        .longitude(mCurLocation.getLongitude())
-                        .name("我的位置")
-                        .description("我的位置")
-                        .build();
-                BNRoutePlanNode eNode = new BNRoutePlanNode.Builder()
-                        .latitude(mDestation.getLocation().latitude)
-                        .longitude(mDestation.getLocation().longitude)
-                        .name(mDestation.name)
-                        .description(mDestation.name)
-                        .build();
-                List<BNRoutePlanNode> list = new ArrayList<>();
-                list.add(sNode);
-                list.add(eNode);
-                BaiduNaviManagerFactory.getRoutePlanManager().routePlanToNavi(
-                        list,
-                        IBNRoutePlanManager.RoutePlanPreference.ROUTE_PLAN_PREFERENCE_DEFAULT,
-                        null,
-                        new Handler(Looper.getMainLooper()) {
-                            @Override
-                            public void handleMessage(Message msg) {
-                                switch (msg.what) {
-                                    case IBNRoutePlanManager.MSG_NAVI_ROUTE_PLAN_START:
-                                        Toast.makeText(MainActivity.this.getApplicationContext(),
-                                                "算路开始", Toast.LENGTH_SHORT).show();
-                                        break;
-                                    case IBNRoutePlanManager.MSG_NAVI_ROUTE_PLAN_SUCCESS:
-                                        Toast.makeText(MainActivity.this.getApplicationContext(),
-                                                "算路成功", Toast.LENGTH_SHORT).show();
-                                        break;
-                                    case IBNRoutePlanManager.MSG_NAVI_ROUTE_PLAN_FAILED:
-                                        Toast.makeText(MainActivity.this.getApplicationContext(),
-                                                "算路失败", Toast.LENGTH_SHORT).show();
-                                        break;
-                                    case IBNRoutePlanManager.MSG_NAVI_ROUTE_PLAN_TO_NAVI:
-                                        Toast.makeText(MainActivity.this.getApplicationContext(),
-                                                "算路成功准备进入导航", Toast.LENGTH_SHORT).show();
-                                        Intent intent = new Intent(MainActivity.this,
-                                                DemoGuideActivity.class);
-                                        startActivity(intent);
-                                        break;
-                                    default:
-                                        // nothing
-                                        break;
-                                }
-                            }
-                        });
+                startNavi(true);
             }
         });
+        Button simNav=findViewById(R.id.simnavi);
+        simNav.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startNavi(false);
+            }
+        });
+    }
+
+    private void startNavi(boolean isRealNavi) {
+        if(mCurLocation==null||mDestation==null)
+            return;
+        BNRoutePlanNode sNode = new BNRoutePlanNode.Builder()
+                .latitude(mCurLocation.getLatitude())
+                .longitude(mCurLocation.getLongitude())
+                .name("我的位置")
+                .description("我的位置")
+                .build();
+        BNRoutePlanNode eNode = new BNRoutePlanNode.Builder()
+                .latitude(mDestation.getLocation().latitude)
+                .longitude(mDestation.getLocation().longitude)
+                .name(mDestation.name)
+                .description(mDestation.name)
+                .build();
+        List<BNRoutePlanNode> list = new ArrayList<>();
+        list.add(sNode);
+        list.add(eNode);
+        BaiduNaviManagerFactory.getRoutePlanManager().routePlanToNavi(
+                list,
+                IBNRoutePlanManager.RoutePlanPreference.ROUTE_PLAN_PREFERENCE_DEFAULT,
+                null,
+                new Handler(Looper.getMainLooper()) {
+                    @Override
+                    public void handleMessage(Message msg) {
+                        switch (msg.what) {
+                            case IBNRoutePlanManager.MSG_NAVI_ROUTE_PLAN_START:
+                                Toast.makeText(MainActivity.this.getApplicationContext(),
+                                        "算路开始", Toast.LENGTH_SHORT).show();
+                                break;
+                            case IBNRoutePlanManager.MSG_NAVI_ROUTE_PLAN_SUCCESS:
+                                Toast.makeText(MainActivity.this.getApplicationContext(),
+                                        "算路成功", Toast.LENGTH_SHORT).show();
+                                break;
+                            case IBNRoutePlanManager.MSG_NAVI_ROUTE_PLAN_FAILED:
+                                Toast.makeText(MainActivity.this.getApplicationContext(),
+                                        "算路失败", Toast.LENGTH_SHORT).show();
+                                break;
+                            case IBNRoutePlanManager.MSG_NAVI_ROUTE_PLAN_TO_NAVI:
+                                Toast.makeText(MainActivity.this.getApplicationContext(),
+                                        "算路成功准备进入导航", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(MainActivity.this,
+                                        DemoGuideActivity.class);
+                                intent.putExtra("isRealNavi",isRealNavi);
+                                startActivity(intent);
+                                break;
+                            default:
+                                // nothing
+                                break;
+                        }
+                    }
+
+                });
     }
 
     private boolean initDirs() {

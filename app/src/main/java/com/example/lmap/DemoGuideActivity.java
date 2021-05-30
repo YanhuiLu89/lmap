@@ -1,7 +1,9 @@
 package com.example.lmap;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentActivity;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Message;
@@ -20,14 +22,15 @@ import com.baidu.navisdk.ui.routeguide.model.RGLineItem;
 
 import java.util.List;
 
-public class DemoGuideActivity extends AppCompatActivity {
+public class DemoGuideActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //管理专业导航生命周期
         Bundle bundle = new Bundle();
         // IS_REALNAVI代表导航类型，true表示真实导航，false表示模拟导航，默认是true
-        bundle.putBoolean(BNaviCommonParams.ProGuideKey.IS_REALNAVI, true);
+        boolean isRealNavi=getIntent().getBooleanExtra("isRealNavi",true);
+        bundle.putBoolean(BNaviCommonParams.ProGuideKey.IS_REALNAVI,isRealNavi);
         // IS_SUPPORT_FULL_SCREEN代表是否沉浸式，默认是true
         bundle.putBoolean(BNaviCommonParams.ProGuideKey.IS_SUPPORT_FULL_SCREEN, true);
         BNGuideConfig config = new BNGuideConfig.Builder().params(bundle).build();
@@ -173,7 +176,7 @@ public class DemoGuideActivity extends AppCompatActivity {
 
             @Override
             public void onNaviBackClick() {
-
+                BaiduNaviManagerFactory.getRouteGuideManager().forceQuitNaviWithoutDialog();
             }
 
             @Override
@@ -216,7 +219,8 @@ public class DemoGuideActivity extends AppCompatActivity {
 
     @Override
     protected void onStart() {
-        super.onStart();BaiduNaviManagerFactory.getRouteGuideManager().onStart();
+        super.onStart();
+        BaiduNaviManagerFactory.getRouteGuideManager().onStart();
     }
 
     @Override
