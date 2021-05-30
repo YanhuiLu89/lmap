@@ -481,7 +481,7 @@ public class MainActivity extends AppCompatActivity{
             sdDir = Environment.getExternalStorageDirectory();//获取跟目录
         }
         BNTTsInitConfig.Builder builder=new BNTTsInitConfig.Builder();
-        builder.context(getApplicationContext()).sdcardRootPath(mSDCardPath.toString()).appFolderName(APP_FOLDER_NAME).appId(("tts appid"));
+        builder.context(getApplicationContext()).sdcardRootPath(mSDCardPath.toString()).appFolderName(APP_FOLDER_NAME).appId(("24274222"));
         BaiduNaviManagerFactory.getTTSManager().initTTS( builder.build());
 
         // 注册同步内置tts状态回调
