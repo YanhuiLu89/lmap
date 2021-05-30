@@ -22,6 +22,9 @@ import com.baidu.navisdk.ui.routeguide.model.RGLineItem;
 
 import java.util.List;
 
+import static com.baidu.navisdk.adapter.IBNaviViewListener.Action.ContinueNavi;
+import static com.baidu.navisdk.adapter.IBNaviViewListener.Action.OpenSetting;
+
 public class DemoGuideActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,6 +151,7 @@ public class DemoGuideActivity extends FragmentActivity {
 
             @Override
             public void onNaviGuideEnd() {
+                finish();
 
             }
         });
@@ -176,7 +180,7 @@ public class DemoGuideActivity extends FragmentActivity {
 
             @Override
             public void onNaviBackClick() {
-                BaiduNaviManagerFactory.getRouteGuideManager().forceQuitNaviWithoutDialog();
+                BaiduNaviManagerFactory.getRouteGuideManager().stopNavi();
             }
 
             @Override
